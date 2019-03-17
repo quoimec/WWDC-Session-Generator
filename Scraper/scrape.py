@@ -150,7 +150,6 @@ class ScrapeWWDC:
 
         corpusFile.close()
 
-
 listWWDC = [
     "https://developer.apple.com/videos/wwdc2015",
     "https://developer.apple.com/videos/wwdc2016",
@@ -160,4 +159,5 @@ listWWDC = [
 
 scrapeJob = ScrapeWWDC(listWWDC)
 
+scrapeJob.executeScrape()
 scrapeJob.completeCorpus()
