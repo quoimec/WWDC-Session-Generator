@@ -123,12 +123,33 @@ class ScrapeWWDC:
                 if not os.path.exists("Data/" + sessionYear + "/"):
                     os.makedirs("Data/" + sessionYear + "/")
 
-                fileName = sessionYear + "/" + sessionNumber + ":" + sessionTitle.replace(" ", "-") + ".txt"
+                fileName = sessionYear + "/" + sessionNumber + ":" + sessionTitle.replace(" ", "-").replace("/", "-") + ".txt"
                 transcriptFile = open("Data/" + fileName, "w")
                 transcriptFile.write(sessionTranscript)
                 transcriptFile.close()
 
         self.timerObject.completeJob("Stage 2: Session Transcripts", self.errorList)
+
+    def completeCorpus(self):
+
+        corpusFile = open("Data/Corpus.txt", "w")
+
+        for eachYear in os.listdir("Data/"):
+
+            yearDirectory = "Data/" + eachYear
+
+            if not os.path.isdir(yearDirectory):
+                continue
+
+            for eachFile in os.listdir(yearDirectory):
+
+                if eachFile[-4:] != ".txt":
+                    continue
+
+                corpusFile.write(open(yearDirectory + "/" + eachFile, "r").read())
+
+        corpusFile.close()
+
 
 listWWDC = [
     "https://developer.apple.com/videos/wwdc2015",
@@ -139,4 +160,4 @@ listWWDC = [
 
 scrapeJob = ScrapeWWDC(listWWDC)
 
-scrapeJob.executeScrape()
+scrapeJob.completeCorpus()
