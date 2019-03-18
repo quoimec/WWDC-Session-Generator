@@ -10,12 +10,9 @@ import os
 
 class ScrapeWWDC:
 
-    def __init__(self, listWWDC, rateLimit = 3.0):
+    def __init__(self, listWWDC):
 
         self.listWWDC = listWWDC
-        self.rateLimit = rateLimit
-        self.lastScrape = datetime.datetime.now()
-
         self.timerObject = Timer()
         self.errorList = []
 
