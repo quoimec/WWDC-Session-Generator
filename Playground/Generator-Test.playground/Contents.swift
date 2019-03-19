@@ -1,11 +1,27 @@
-////
-//// Core_CKPT_91_10.swift
-////
-//// This file was automatically generated and should not be edited.
-////
-//
-//import CoreML
-//
+import CoreML
+
+
+
+func encodeString(passedString: String) {
+	
+	var mutableString = passedString.lowercased()
+	var specialChars = [".", "?", "!", ","]
+	for eachChar in specialChars {
+		mutableString = mutableString.replacingOccurrences(of: eachChar, with: " \(eachChar) ")
+	}
+
+	let splitString = mutableString.split(separator: " ")
+
+	print(splitString)
+
+}
+
+encodeString(passedString: "Hello world this is m!~e, life should be   . Fun for everyone!")
+
+
+
+
+
 //
 ///// Model Prediction Input Type
 //@available(macOS 10.13, iOS 11.0, tvOS 11.0, watchOS 4.0, *)
@@ -38,7 +54,7 @@
 //        }
 //        return nil
 //    }
-//	
+//
 //    init(input1: MLMultiArray, lstm_1_h_in: MLMultiArray? = nil, lstm_1_c_in: MLMultiArray? = nil) {
 //        self.input1 = input1
 //        self.lstm_1_h_in = lstm_1_h_in
@@ -73,7 +89,7 @@
 //    var featureNames: Set<String> {
 //        return self.provider.featureNames
 //    }
-//	
+//
 //    func featureValue(for featureName: String) -> MLFeatureValue? {
 //        return self.provider.featureValue(for: featureName)
 //    }
@@ -197,3 +213,45 @@
 //        return results
 //    }
 //}
+
+//let model = Core_CKPT_91_10_1()
+
+
+
+//
+//let ngramSize = 7
+//var multi = try MLMultiArray(shape: [ngramSize, 1, 1], dataType: .double)
+//
+//multi[0] = 39
+//multi[1] = 112
+//multi[2] = 48
+//multi[3] = 133
+//multi[4] = 910
+//multi[5] = 1243
+//multi[6] = 10
+//
+//
+//	let input = try WordLanguageModelInput(tokenizedInputSeq: multi)
+//	let output = try model.prediction(input: input)
+//
+//	let tokenProbability = output.featureValue(for: "output1")
+//
+//	if let tokenOutput = tokenProbability?.multiArrayValue {
+//		updateTime()
+//		let thing = Array(UnsafeBufferPointer(start: tokenOutput.dataPointer.bindMemory(to: Double.self, capacity: tokenOutput.count), count: tokenOutput.count))
+//
+//		var final: Array<(Int, Double)> = [(0, 0), (0, 0), (0, 0)]
+//
+//		for (eachIndex, eachElement) in thing.enumerated() {
+//
+//			if eachElement > final[0].1 {
+//
+//				final[0] = (eachIndex, eachElement)
+//				final.sort(by: { $0.1 < $1.1 })
+//
+//			}
+//
+//		}
+//
+//		print(final)
+
