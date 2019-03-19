@@ -4,7 +4,8 @@
 
 import re
 from functools import reduce
-import json
+import sqlite3
+import os
 from keras.preprocessing import text as kt
 from keras import utils as ku
 from keras import models as km
@@ -33,7 +34,27 @@ tokeniserObject.fit_on_texts(ngramCorpus)
 tokenisedCorpus = tokeniserObject.texts_to_sequences(ngramCorpus)
 tokenisedVocabulary = len(tokeniserObject.word_index) + 1
 
-json.dump(tokeniserObject.word_index, open("Model/word_index.json", "w"))
+def generateDatabase(databaseName, wordIndex):
+
+    for eachFile in os.listdir("Model/"):
+        if eachFile == databaseName:
+            os.remove("Model/" + eachFile)
+
+    databaseConnection = sqlite3.connect("Model/" + databaseName)
+    databaseCursor = databaseConnection.cursor()
+
+    databaseCursor.execute("CREATE TABLE Lookup (token integer PRIMARY KEY, value text NOT NULL);")
+
+    for eachValue, eachToken in wordIndex.items():
+
+        databaseCursor.execute("INSERT INTO Lookup (token, value) VALUES (?, ?);", (eachToken, eachValue))
+
+    databaseConnection.commit()
+    databaseConnection.close()
+
+    print "✔︎ Generated SQLite Database with " + str(len(wordIndex) + 1) + " Entries"
+
+generateDatabase("Tokenised.sqlite", tokeniserObject.word_index)
 
 if max(list(map(lambda a: len(a), tokenisedCorpus))) > ngramSize:
     raise Exception("Error: Irregular token length -> Probably due to filtered symbol.")
