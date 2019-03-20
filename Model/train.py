@@ -14,7 +14,8 @@ from nltk import ngrams
 import numpy as np
 from coremltools.converters import keras as kc
 
-textCorpus = re.sub(r"[/:$%^&*(){}]", "", open("Model/Mini-Corpus.txt", "r").read()).replace(" -- ", " ").replace("-", " ").replace(", ", " , ").replace(". ", " .  .  ").replace("? ", " ?  ?  ").replace("! ", " !  !  ").replace("2015", "2019").replace("2016", "2019").replace("2017", "2019").replace("2018", "2019").lower()
+textFile = "Scraper/Data/Quarter-Corpus.txt"
+textCorpus = re.sub(r"[/:$%^&*(){}]", "", unicode(open(textFile, "r").read(), "utf-8")).replace(" -- ", " ").replace("-", " ").replace(", ", " , ").replace(". ", " .  .  ").replace("? ", " ?  ?  ").replace("! ", " !  !  ").replace("2015", "2019").replace("2016", "2019").replace("2017", "2019").replace("2018", "2019").lower().replace("ios 12", "ios 13").replace("ios 11", "ios 13").replace("ios 10", "ios 13").replace("ios 9", "ios 13").replace("mojave", "sonoma").replace("high sierra", "sonoma").replace("sierra", "sonoma").replace("el capitan", "sonoma")
 
 def ngramCreate(wordList, ngramSize):
 
@@ -26,7 +27,7 @@ def ngramCreate(wordList, ngramSize):
     else:
         return ngrams(wordList, ngramSize)
 
-ngramSize = 7
+ngramSize = 9
 ngramCorpus = [" ".join(b) for a in list(map(lambda c: ngramCreate(c.split(" "), ngramSize), re.split("  .  |  ?  |  !  ", textCorpus))) for b in a]
 
 tokeniserObject = kt.Tokenizer(filters = '"#$%&()*+/:;<=>[\\]^_`{|}~\t\n')
@@ -46,8 +47,10 @@ def generateDatabase(databaseName, wordIndex):
     databaseCursor.execute("CREATE TABLE Lookup (token integer PRIMARY KEY, value text NOT NULL);")
 
     for eachValue, eachToken in wordIndex.items():
-
-        databaseCursor.execute("INSERT INTO Lookup (token, value) VALUES (?, ?);", (eachToken, eachValue))
+        try:
+            databaseCursor.execute("INSERT INTO Lookup (token, value) VALUES (?, ?);", (eachToken, eachValue))
+        except:
+            print("Skipping: " + str(eachValue))
 
     databaseConnection.commit()
     databaseConnection.close()
@@ -57,7 +60,13 @@ def generateDatabase(databaseName, wordIndex):
 generateDatabase("Tokenised.sqlite", tokeniserObject.word_index)
 
 if max(list(map(lambda a: len(a), tokenisedCorpus))) > ngramSize:
-    raise Exception("Error: Irregular token length -> Probably due to filtered symbol.")
+
+    print("Error: Irregular token length -> Probably due to filtered symbol.")
+    # tokenisedCorpus = list(filter(lambda a: len(a) <= ngramSize, tokenisedCorpus))
+
+# Add check here to clean the tokenisedCorpus better
+
+tokenisedCorpus = list(filter(lambda a: len(a) <= ngramSize and len(a) >= 2, tokenisedCorpus))
 
 modelTrain, modelPredict = zip(*list(map(lambda a: ([0] * (ngramSize - len(a)) + a[:-1], a[-1]), tokenisedCorpus)))
 
@@ -74,13 +83,13 @@ sequentialModel = km.Sequential([
 
 sequentialModel.compile(loss = "categorical_crossentropy", optimizer = "adam", metrics=["accuracy"])
 
-epochCount = 100
-checkPoint = 10
+epochCount = 300
+checkPoint = 3
 
 for i in range(0, int(epochCount / checkPoint)):
 
     if i > 0:
-        sequentialModel = km.load_model("Model/Checkpoints/Keras-CKPT-" + str(i + 1) + "-" + str(int(epochCount / checkPoint)) + ".h5")
+        sequentialModel = km.load_model("Model/Checkpoints/Keras-CKPT-" + str(i) + "-" + str(int(epochCount / checkPoint)) + ".h5")
 
     print ""
     print "- Starting " + str((i + 1)) + " of " + str(int(epochCount / checkPoint))

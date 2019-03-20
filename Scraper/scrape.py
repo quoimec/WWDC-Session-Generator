@@ -129,7 +129,7 @@ class ScrapeWWDC:
 
     def completeCorpus(self):
 
-        corpusFile = open("Data/Corpus.txt", "w")
+        corpusFile = open("Data/Quarter-Corpus.txt", "w")
 
         for eachYear in os.listdir("Data/"):
 
@@ -156,5 +156,5 @@ listWWDC = [
 
 scrapeJob = ScrapeWWDC(listWWDC)
 
-scrapeJob.executeScrape()
+# scrapeJob.executeScrape()
 scrapeJob.completeCorpus()
