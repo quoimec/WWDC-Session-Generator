@@ -129,7 +129,7 @@ class ScrapeWWDC:
 
     def completeCorpus(self):
 
-        corpusFile = open("Data/Quarter-Corpus.txt", "w")
+        corpusFile = open("Data/Mini-Corpus.txt", "w")
 
         for eachYear in os.listdir("Data/"):
 

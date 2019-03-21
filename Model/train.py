@@ -14,7 +14,7 @@ from nltk import ngrams
 import numpy as np
 from coremltools.converters import keras as kc
 
-textFile = "Scraper/Data/Quarter-Corpus.txt"
+textFile = "Scraper/Data/Mini-Corpus.txt"
 textCorpus = re.sub(r"[/:$%^&*(){}]", "", unicode(open(textFile, "r").read(), "utf-8")).replace(" -- ", " ").replace("-", " ").replace(", ", " , ").replace(". ", " .  .  ").replace("? ", " ?  ?  ").replace("! ", " !  !  ").replace("2015", "2019").replace("2016", "2019").replace("2017", "2019").replace("2018", "2019").lower().replace("ios 12", "ios 13").replace("ios 11", "ios 13").replace("ios 10", "ios 13").replace("ios 9", "ios 13").replace("mojave", "sonoma").replace("high sierra", "sonoma").replace("sierra", "sonoma").replace("el capitan", "sonoma")
 
 def ngramCreate(wordList, ngramSize):
