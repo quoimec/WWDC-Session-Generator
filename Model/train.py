@@ -71,7 +71,8 @@ tokenisedCorpus = list(filter(lambda a: len(a) <= ngramSize and len(a) >= 2, tok
 modelTrain, modelPredict = zip(*list(map(lambda a: ([0] * (ngramSize - len(a)) + a[:-1], a[-1]), tokenisedCorpus)))
 
 modelTrain = np.array(modelTrain)
-modelPredict = ku.to_categorical(np.array(modelPredict), num_classes = tokenisedVocabulary)
+modelPredict = np.array(modelPredict)
+# modelPredict = ku.to_categorical(np.array(modelPredict), num_classes = tokenisedVocabulary)
 
 sequentialModel = km.Sequential([
     kl.Embedding(tokenisedVocabulary, 128, input_length = ngramSize - 1),
@@ -81,10 +82,10 @@ sequentialModel = km.Sequential([
     kl.Dense(tokenisedVocabulary, activation = "softmax")
 ])
 
-sequentialModel.compile(loss = "categorical_crossentropy", optimizer = "adam", metrics=["accuracy"])
+sequentialModel.compile(loss = "sparse_categorical_crossentropy", optimizer = "adam", metrics=["accuracy"])
 
 epochCount = 300
-checkPoint = 3
+checkPoint = 1
 
 for i in range(0, int(epochCount / checkPoint)):
 
