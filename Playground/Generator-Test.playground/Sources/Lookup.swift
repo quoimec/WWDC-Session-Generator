@@ -8,7 +8,7 @@ public class Lookup {
 	public init?(databasePath: String?) {
 	
 		if sqlite3_open(databasePath, &database) != SQLITE_OK {
-			print("Failed to open SQLite File")
+			print("Error: Failed to open SQLite File")
 			return nil
 		}
 	
