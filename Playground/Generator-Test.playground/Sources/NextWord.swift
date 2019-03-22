@@ -44,7 +44,7 @@ public class NextWord {
 
 	}
 	
-	public func runPredictions(initialTokens: Array<Int>, wordCount: Int, predictionScope: Int) -> Array<Int> {
+	public func runPredictions(initialTokens: Array<Int>, wordCount: Int, predictionScope: Int, punctuationTokens: Array<Int>) -> Array<Int> {
 		
 		var buildingTokens = Array<Int>()
 		var safeTokens = initialTokens.count == self.ngramSize ? initialTokens : spliceArray(passedArray: initialTokens)
@@ -53,7 +53,7 @@ public class NextWord {
 	
 		for _ in 0 ..< safeCount {
 		
-			guard let newPrediction = makePrediction(safeTokens: safeTokens, safeScope: safeScope) else {
+			guard let newPrediction = makePrediction(safeTokens: safeTokens, safeScope: safeScope, punctuationTokens: punctuationTokens) else {
 				continue
 			}
 			
@@ -68,7 +68,7 @@ public class NextWord {
 	
 	}
 	
-	func makePrediction(safeTokens: Array<Int>, safeScope: Int) -> Int? {
+	func makePrediction(safeTokens: Array<Int>, safeScope: Int, punctuationTokens: Array<Int>) -> Int? {
 	
 		guard let inputArray = try? MLMultiArray(shape: [NSNumber(value: self.ngramSize), 1, 1], dataType: .int32) else {
 			print("Error: Failed to initialise input MLArray... Somehow? Don't ask me.")
@@ -93,10 +93,11 @@ public class NextWord {
 		
 		let tokenArray = Array(UnsafeBufferPointer(start: tokenOutput.dataPointer.bindMemory(to: Double.self, capacity: tokenOutput.count), count: tokenOutput.count))
 		var topPredictions = Array<(Int, Double)>.init(repeating: (0, 0.0), count: safeScope)
+		let banPunctuation = safeTokens.map({ punctuationTokens.contains($0) }).reduce(false, {$0 || $1})
 		
 		for (eachIndex, eachElement) in tokenArray.enumerated() {
 		
-			if eachElement > topPredictions[0].1 {
+			if eachElement > topPredictions[0].1 && (!punctuationTokens.contains(eachIndex) || !banPunctuation){
 				topPredictions[0] = (eachIndex, eachElement)
 				topPredictions.sort(by: { $0.1 < $1.1 })
 			}
